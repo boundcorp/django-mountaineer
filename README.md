@@ -54,13 +54,16 @@ from django.core.asgi import get_asgi_application
 from starlette.staticfiles import StaticFiles
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simpleintegration.settings')
-
+# These 2 lines will initialize django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django_app = get_asgi_application()
 
-# Put these lines right after you initialize `controller = AppController()`
-controller.app.mount("/staticfiles", StaticFiles(directory="staticfiles"), name="static")
+# Put these lines below your mountaineer controller.register() lines
 controller.app.mount("/", django_app, name="app")
+# This line is optional, but it mounts the static files from Django to the mountaineer app
+# django normally uses /static for this, but this collides with mountaineer, so we should
+# point django's STATIC_URL and STATIC_ROOT to /staticfiles
+controller.app.mount("/staticfiles", StaticFiles(directory="staticfiles"), name="static")
 ```
 
 ## Run Django and Mountaineer together
