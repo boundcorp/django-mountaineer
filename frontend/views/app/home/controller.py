@@ -3,6 +3,8 @@ from datetime import datetime
 from mountaineer import ControllerBase, Metadata, RenderBase
 from pydantic import BaseModel
 
+from frontend.controller import PageController
+
 
 class QuestionOutput(BaseModel):
     question_text: str
@@ -16,10 +18,7 @@ class HomeRender(RenderBase):
     questions: list[QuestionOutput] = []
 
 
-class HomeController(ControllerBase):
-    url = "/"
-    view_path = "/app/home/page.tsx"
-
+class HomeController(PageController("/")):
     async def render(
             self,
     ) -> HomeRender:

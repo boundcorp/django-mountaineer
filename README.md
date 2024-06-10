@@ -82,16 +82,14 @@ The django admin will be accessible at http://localhost:5006/admin/.
 You should view the [HomeController](/frontend/views/app/home/controller.py) at http://localhost:5006/,
 which shows an example of retrieving resources from Django ORM and returning them via mountaineer SSR.
 
-## Notes:
+## Extras:
 
-### RouteController
+### PageController
 
-I've also included a simple helper I wrote `RouteController(url: string)` in
-the [frontend/controllers/route.py](/frontend/controllers/route.py) file, which can be used to fetch data from Django
-views.
-This is just a helper for introspecting the proper `page.tsx` path for a given Mountaineer controller; it's totally
-optional,
-but I find it more convenient to colocate the page and controller logic within the `frontend/views/` folder.
+I've also included a simple helper I wrote `PageController(url: string)` in
+the [frontend/controller.py](/frontend/controller.py) file, which can be used to introspect the proper `page.tsx`;
+it's totally optional, but I find it more convenient to colocate the page and controller logic within the
+`frontend/views/` folder.
 
 ### Controller Sniffing
 
