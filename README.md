@@ -1,26 +1,20 @@
-# DIY Simple Django-Mountaineer Integration Example
+# Simple Django-Mountaineer Integration Example
 
 This is a simple example of how to integrate Django with [Mountaineer](https://mountaineer.sh).
 These are the bare-minimum steps to get Django and Mountaineer to work together, which should be simple enough
 to follow in any Django project. I've demonstrated this with a fresh Django project, to avoid unforeseen complications.
 
-## Start with a  Django project
+## Clean django and mountaineer projects
 
-I started with a simplest-possible django project with a single app `polls`, following
-the [Django tutorial](https://docs.djangoproject.com/en/5.0/intro/tutorial01/).
+I started with a simplest-possible django project (called "backend") with a single app `polls`, following
+the [Django tutorial](https://docs.djangoproject.com/en/5.0/intro/tutorial01/), and added a mountaineer project (
+called "frontend").
 
 ```bash
 django-admin startproject simpleintegration
 cd simpleintegration
 python manage.py startapp polls
-```
 
-## Install [Mountaineer](https://mountaineer.sh)
-
-Mountaineer provides a `create-mountaineer-project` helper that is quite comprehensive, but we only need a few of the
-files it generates. I'll put it in a folder called `frontend/` for now, but you can choose anything you want here.
-
-```bash
 pipx run create-mountaineer-app
 ? Project name [my-project]: frontend
 ? Author [Leeward Bound <leeward@boundcorp.net>]
@@ -40,21 +34,13 @@ mv frontend/ discard-outer-folder/
 mv discard-outer-folder/frontend/ .
 
 # Remove the SQLModel stuff and references to Details and Home views in frontend
-rm -rf frontend/models frontend/views/app/detail frontend/views/app/home frontend/controllers/detail.py frontend/controllers/home.py
+rm -rf frontend/models frontend/views/app/detail frontend/views/app/home frontend/controllers/detail.py frontend/controllers/controller.py
 
 # Append the Mountaineer .gitignore to your project root, this is important to ignore _server/ folders -
 cat discard-outer-folder/.gitignore >>.gitignore
 
 # Cleanup
 rm -rf discard-outer-folder
-```
-
-Edit `frontend/config.py` and remove DatabaseConfig as a baseclass from AppConfig:
-
-```python
-from mountaineer import ConfigBase
-class AppConfig(ConfigBase):
-    pass
 ```
 
 ## Mount Django in your Mountaineer app
@@ -68,7 +54,6 @@ from django.core.asgi import get_asgi_application
 from starlette.staticfiles import StaticFiles
 import os
 
-
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simpleintegration.settings')
 
 django_app = get_asgi_application()
@@ -78,25 +63,42 @@ controller.app.mount("/staticfiles", StaticFiles(directory="staticfiles"), name=
 controller.app.mount("/", django_app, name="app")
 ```
 
-Finally, remove some references to SQLModel in `frontend/cli.py`:
-```python
-# Remove the models import
-from frontend import models
-
-...
-# And remove the whole `createdb` function
-@command()
-@async_to_sync
-async def createdb():
-    _ = AppConfig() # type: ignore
-
-    await handle_createdb(models)
-```
-
 ## Run Django and Mountaineer together
 
 You can start the normal Mountaineer development server with the following command:
 
 ```bash
+poetry run runserver
+```
 
+While still using manage.py for most normal django functionality:
+
+```bash
+poetry run python manage.py migrate
+poetry run python manage.py createsuperuser
+```
+
+The django admin will be accessible at http://localhost:5006/admin/.
+You should view the [HomeController](/frontend/views/app/home/controller.py) at http://localhost:5006/,
+which shows an example of retrieving resources from Django ORM and returning them via mountaineer SSR.
+
+## Notes:
+
+### RouteController
+
+I've also included a simple helper I wrote `RouteController(url: string)` in
+the [frontend/controllers/route.py](/frontend/controllers/route.py) file, which can be used to fetch data from Django
+views.
+This is just a helper for introspecting the proper `page.tsx` path for a given Mountaineer controller; it's totally
+optional,
+but I find it more convenient to colocate the page and controller logic within the `frontend/views/` folder.
+
+### Controller Sniffing
+
+If you check my `frontend/app.py`, you'll see that I'm using a simple controller sniffing mechanism to automatically
+load the controllers found within the `frontend/views` folder. This is a simple `django-ification` of the mountaineer
+convention and just a personal preference.
+
+### WIP
+- [ ] use Django Auth in Mountaineer views
 

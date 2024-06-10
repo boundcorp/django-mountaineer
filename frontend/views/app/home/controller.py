@@ -7,8 +7,8 @@ from pydantic import BaseModel
 class QuestionOutput(BaseModel):
     question_text: str
     pub_date: datetime
+
     class Config:
-        orm_mode = True
         from_attributes = True
 
 
