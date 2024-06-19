@@ -12,8 +12,9 @@ readme = "README.md"
 python = "^3.10"
 
 
-mountaineer = "^0.5.0"
+mountaineer = "0.5.1.dev1"
 django = "^5.0.6"
+itsdangerous = "^2.2.0"
 
 
 [build-system]

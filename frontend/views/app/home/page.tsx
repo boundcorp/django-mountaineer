@@ -1,13 +1,13 @@
 
-import React from "react";
-import { useServer } from "./_server/useServer";
+import * as React from "react";
+import { useServer } from "./_server";
 
 const Home = () => {
   const serverState = useServer();
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl">Home</h1>
+      <h1 className="text-2xl">Welcome &lt;{serverState.user?.username || "anon"}&gt;</h1>
       <div>
         <small>{serverState.questions.length} questions</small>
         <ol>
