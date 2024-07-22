@@ -1,12 +1,9 @@
-import json
-
 from asgiref.sync import sync_to_async
-from django.contrib.auth import login, alogin
+from django.contrib.auth import alogin
 from fastapi import Depends
 from mountaineer import Metadata, RenderBase, ControllerBase, sideeffect, APIException
 from pydantic import BaseModel
 from starlette.requests import Request
-from starlette.responses import Response
 
 from frontend.auth import AuthDependencies
 
@@ -20,9 +17,6 @@ class UserOutput(BaseModel):
     email: str
     first_name: str
     last_name: str
-
-    class Config:
-        from_attributes = True
 
 
 class LoginRender(RenderBase):

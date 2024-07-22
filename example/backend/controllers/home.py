@@ -12,18 +12,12 @@ class QuestionOutput(BaseModel):
     question_text: str
     pub_date: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class UserOutput(BaseModel):
     username: str
     email: str
     first_name: str
     last_name: str
-
-    class Config:
-        from_attributes = True
 
 
 class HomeRender(RenderBase):
