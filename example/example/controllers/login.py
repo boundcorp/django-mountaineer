@@ -5,18 +5,12 @@ from mountaineer import Metadata, RenderBase, ControllerBase, sideeffect, APIExc
 from pydantic import BaseModel
 from starlette.requests import Request
 
-from example.auth import AuthDependencies
+from example.auth import AuthDependencies, UserOutput
 
 class FormError(APIException):
-    status_code = 400
-    detail = "An error occurred while processing the form"
+    status_code: int = 400
+    detail: str = "An error occurred while processing the form"
     field_errors: dict[str, str] | None = None
-
-class UserOutput(BaseModel):
-    username: str
-    email: str
-    first_name: str
-    last_name: str
 
 
 class LoginRender(RenderBase):
@@ -25,19 +19,18 @@ class LoginRender(RenderBase):
 
 class LoginController(ControllerBase):
     url = "/login"
-    view_path = "src/login/page.tsx"
+    view_path = "src/pages/login/page.tsx"
 
     async def render(
             self,
             user: UserOutput | None = Depends(AuthDependencies.get_user),
     ) -> LoginRender:
         return LoginRender(
-            user=user,
             metadata=Metadata(title="Login"),
         )
 
-    @sideeffect(exception_models=[FormError])
-    async def login(self, username: str, password: str, request: Request) -> None:
+    @sideeffect
+    async def login(self, username: str, password: str, request: Request):
 
         if not username or not password:
             raise FormError(status_code=400, detail="Invalid username or password")
@@ -47,3 +40,7 @@ class LoginController(ControllerBase):
         if not user:
             raise FormError(status_code=400, detail="Invalid username or password")
         await alogin(request.state.django_request, user)
+        return LoginRender(
+            user=user,
+            metadata=Metadata(title="Login"),
+        )

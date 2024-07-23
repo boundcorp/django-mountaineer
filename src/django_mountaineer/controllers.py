@@ -3,7 +3,7 @@ import glob
 import os
 from typing import List, Type
 
-from mountaineer import ControllerBase
+from mountaineer import ControllerBase, LayoutControllerBase
 
 
 def find_controllers(search_paths: List[str]) -> List[Type[ControllerBase]]:
@@ -21,6 +21,7 @@ def find_controllers(search_paths: List[str]) -> List[Type[ControllerBase]]:
                     isinstance(obj, type)
                     and issubclass(obj, ControllerBase)
                     and not obj == ControllerBase
+                    and not obj == LayoutControllerBase
                 ):
                     yield obj
 

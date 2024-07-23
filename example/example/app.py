@@ -17,7 +17,7 @@ app_controller = AppController(
     config=AppConfig(), # type: ignore
     
     global_metadata=Metadata(
-        links=[LinkAttribute(rel="stylesheet", href="/static/app_main.css")]
+        links=[LinkAttribute(rel="stylesheet", href="/static/src_main.css")]
     ),
     custom_builders=[
         PostCSSBundler(),
