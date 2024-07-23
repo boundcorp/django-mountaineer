@@ -29,7 +29,7 @@ def get_session(request: Request):
 class AuthDependencies():
     @staticmethod
     async def get_user(request: Request):
-        from backend.controllers.home import UserOutput
+        from example.controllers.home import UserOutput
         if not hasattr(request.state, "django_request"):
             return None
         user = await request.state.django_request.auser()

@@ -1,20 +1,20 @@
+
+
+
 [tool.poetry]
-name = "frontend"
+name = "example"
 version = "0.1.0"
 description = ""
 authors = ["Leeward Bound <leeward@boundcorp.net>"]
 readme = "README.md"
-package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.10"
 
 
-mountaineer = "^0.5.0"
+mountaineer = "0.5.1"
 django = "^5.0.0"
 itsdangerous = "^2.2.0"
-
-# While in development, link to the local path
 django-mountaineer = { path = "../", develop = true }
 
 
@@ -23,10 +23,10 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-runserver = "frontend.cli:runserver"
-watch = "frontend.cli:watch"
-build = "frontend.cli:build"
-createdb = "frontend.cli:createdb"
+runserver = "example.cli:runserver"
+watch = "example.cli:watch"
+build = "example.cli:build"
+createdb = "example.cli:createdb"
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]

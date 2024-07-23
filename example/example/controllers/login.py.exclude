@@ -5,7 +5,7 @@ from mountaineer import Metadata, RenderBase, ControllerBase, sideeffect, APIExc
 from pydantic import BaseModel
 from starlette.requests import Request
 
-from frontend.auth import AuthDependencies
+from example.auth import AuthDependencies
 
 class FormError(APIException):
     status_code = 400
@@ -25,7 +25,7 @@ class LoginRender(RenderBase):
 
 class LoginController(ControllerBase):
     url = "/login"
-    view_path = "app/login/page.tsx"
+    view_path = "src/login/page.tsx"
 
     async def render(
             self,

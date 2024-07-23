@@ -4,6 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["Lee Edward Bound <leeward@boundcorp.net>"]
 readme = "README.md"
+packages = [
+    { include = "django_mountaineer", from = "src" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -49,3 +52,13 @@ addopts = "-m 'not integration_tests'"
 [project]
 name = "django_mountaineer"
 version = "0.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+runserver = "example_django_mountaineer.frontend.cli:runserver"
+watch = "example_django_mountaineer.frontend.cli:watch"
+build = "example_django_mountaineer.frontend.cli:build"
+createdb = "example_django_mountaineer.frontend.cli:createdb"

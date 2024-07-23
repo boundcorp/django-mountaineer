@@ -5,12 +5,15 @@ from mountaineer import Metadata, RenderBase, ControllerBase
 from pydantic import BaseModel
 from starlette.requests import Request
 
-from frontend.auth import AuthDependencies
+from example.auth import AuthDependencies
 
 
 class QuestionOutput(BaseModel):
     question_text: str
     pub_date: datetime
+
+    class Config:
+        from_attributes = True
 
 
 class UserOutput(BaseModel):
@@ -18,6 +21,9 @@ class UserOutput(BaseModel):
     email: str
     first_name: str
     last_name: str
+
+    class Config:
+        from_attributes = True
 
 
 class HomeRender(RenderBase):
@@ -27,13 +33,13 @@ class HomeRender(RenderBase):
 
 class HomeController(ControllerBase):
     url = "/"
-    view_path = "app/home/page.tsx"
+    view_path = "src/home/page.tsx"
 
     async def render(
             self,
             user: UserOutput | None = Depends(AuthDependencies.get_user),
     ) -> HomeRender:
-        from backend.polls.models import Question
+        from example.apps.polls.models import Question
 
         return HomeRender(
             questions=[

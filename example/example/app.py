@@ -1,46 +1,37 @@
-import os
-
-import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-django.setup()
-
-from django.core.asgi import get_asgi_application
-from backend.urls import urlpatterns
-
-django_app = get_asgi_application()
-
+from fastapi.staticfiles import StaticFiles
 from mountaineer.app import AppController
 from mountaineer.js_compiler.postcss import PostCSSBundler
 from mountaineer.render import LinkAttribute, Metadata
+from django.core.asgi import get_asgi_application
+import django
+import os
 from django_mountaineer.controllers import register_controllers
 from django_mountaineer.middleware import FastAPIDjangoMiddleware
-from starlette.staticfiles import StaticFiles
 
-from .config import AppConfig
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'example.settings')
+django.setup()
 
-config = AppConfig(find_controllers=["frontend/views", "backend/controllers"])
+from example.config import AppConfig
 
 app_controller = AppController(
-    config=config,  # type: ignore
-
+    config=AppConfig(), # type: ignore
+    
     global_metadata=Metadata(
         links=[LinkAttribute(rel="stylesheet", href="/static/app_main.css")]
     ),
     custom_builders=[
         PostCSSBundler(),
     ],
-
+    
 )
 
-# This is the way we normally register controllers in mountaineer
-# but we'll use the auto-discovery helper below, which is totally optional
-# controller.register(HomeController())
+django_app = get_asgi_application()
 
-# Find all controllers in the specified directories
-register_controllers(app_controller, config.find_controllers)
+register_controllers(app_controller, ['example/controllers'])
 
 app_controller.app.mount("/staticfiles", StaticFiles(directory="staticfiles"), name="static")
 app_controller.app.mount("/", django_app, name="app")
+
+from example.urls import urlpatterns
 
 app_controller.app.add_middleware(FastAPIDjangoMiddleware, django_patterns=urlpatterns)
