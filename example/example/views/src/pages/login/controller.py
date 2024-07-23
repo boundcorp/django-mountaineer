@@ -21,9 +21,8 @@ class LoginController(ControllerBase):
     url = "/login"
     view_path = "src/pages/login/page.tsx"
 
-    async def render(
+    def render(
             self,
-            user: UserOutput | None = Depends(AuthDependencies.get_user),
     ) -> LoginRender:
         return LoginRender(
             metadata=Metadata(title="Login"),
@@ -31,7 +30,6 @@ class LoginController(ControllerBase):
 
     @sideeffect
     async def login(self, username: str, password: str, request: Request):
-
         if not username or not password:
             raise FormError(status_code=400, detail="Invalid username or password")
 

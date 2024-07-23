@@ -27,7 +27,7 @@ app_controller = AppController(
 
 django_app = get_asgi_application()
 
-register_controllers(app_controller, ['example/controllers'])
+register_controllers(app_controller, ['example/controllers', 'example/views/src'])
 
 app_controller.app.mount("/staticfiles", StaticFiles(directory="staticfiles"), name="static")
 app_controller.app.mount("/", django_app, name="app")
