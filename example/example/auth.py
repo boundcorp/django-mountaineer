@@ -1,30 +1,32 @@
-import time
 from importlib import import_module
+from asgiref.sync import sync_to_async
 
 from fastapi import Depends
-from pydantic import BaseModel
+from pydantic import ConfigDict
 from starlette.requests import Request
+from starlette.responses import Response
+from django_mountaineer.auth import get_session, get_user_from_session, SessionStore
+from djantic import ModelSchema
+from django.contrib.auth.models import User
 
 
-class UserOutput(BaseModel):
-    username: str
-    email: str
-    first_name: str
-    last_name: str
-
-    class Config:
-        from_attributes = True
+class UserOutput(ModelSchema):
+    model_config = ConfigDict(model=User, include=["id", "username", "email", "first_name", "last_name"])
 
 
 class AuthDependencies():
     @staticmethod
-    async def get_user(request: Request):
-        if not hasattr(request.state, "django_request"):
-            return None
-        user = await request.state.django_request.auser()
+    async def get_user(request: Request, response: Response, session: SessionStore = Depends(get_session)):
+        # If you have the middleware wrapper installed, django_request will be available
+        if hasattr(request.state, "django_request"):
+            user = await request.state.django_request.auser()
+        else:
+            # Otherwise, we have fastapi-alternative implementations of the django session store and user lookup
+            user = await sync_to_async(get_user_from_session)(request, response, session)
         if user.is_anonymous:
             return None
-        return UserOutput.from_orm(user)
+
+        return UserOutput.model_validate(user, from_attributes=True)
 
     @staticmethod
     async def require_user(user=Depends(get_user)):

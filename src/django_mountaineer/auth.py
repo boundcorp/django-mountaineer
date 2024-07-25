@@ -27,7 +27,7 @@ def get_session(request: Request):
     return SessionStore(session_key)
 
 
-def get_user(request: Request, response: Response, session: SessionStore = Depends(get_session)):
+def get_user_from_session(request: Request, response: Response, session: SessionStore):
     """
     Return the user model instance associated with the given request session.
     If no user is retrieved, return an instance of `AnonymousUser`.

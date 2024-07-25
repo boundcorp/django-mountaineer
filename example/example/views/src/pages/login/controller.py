@@ -1,9 +1,8 @@
-from asgiref.sync import sync_to_async
 from django.contrib.auth import alogin
-from fastapi import Depends
 from mountaineer import Metadata, RenderBase, ControllerBase, sideeffect, APIException
 from pydantic import BaseModel
 from starlette.requests import Request
+from asgiref.sync import sync_to_async
 
 from example.auth import AuthDependencies, UserOutput
 

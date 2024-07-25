@@ -1,14 +1,9 @@
-import os
-from pathlib import Path
-from click import command, option, group
+from click import command, option
 from mountaineer.cli import handle_runserver, handle_watch, handle_build
-from mountaineer.io import async_to_sync
 
-from example.config import AppConfig
-from mountaineer import cli
 
-from django_mountaineer.controllers import enable_controllers_in_views_folder
-enable_controllers_in_views_folder()
+from django_mountaineer.controllers import enable_hotreload_controllers_in_views_folder
+enable_hotreload_controllers_in_views_folder()
 
 @command()
 @option("--port", default=5006, help="Port to run the server on")

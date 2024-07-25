@@ -1,5 +1,20 @@
+import React from "react";
 import {FieldValues, UseFormReturn} from "react-hook-form";
-import {FetchErrorBase} from "../../_server/api";
+
+
+// We copied this from the server, because its very short, and we want to avoid
+// doing relative imports in the client for this simple type
+export class FetchErrorBase<T> extends Error {
+  statusCode: number;
+  body: T;
+
+  constructor(statusCode: number, body: T) {
+    super(`Error ${statusCode}: ${body}`);
+
+    this.statusCode = statusCode;
+    this.body = body;
+  }
+}
 
 export interface FormError {
   status_code: number;

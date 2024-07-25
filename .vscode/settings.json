@@ -1,0 +1,12 @@
+{
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/*.log": true,
+        "**/__pycache__": true,
+        "**/_static": true,
+        "**/_server": true,
+        "**/_metadata": true,
+        "**/_ssr": true
+    }
+}
