@@ -30,7 +30,7 @@ build-backend = "poetry.core.masonry.api"
 runserver = "example.cli:runserver"
 watch = "example.cli:watch"
 build = "example.cli:build"
-createdb = "example.cli:createdb"
+generate = "example.cli:generate"
 
 [tool.mypy]
 plugins = ["pydantic.mypy"]

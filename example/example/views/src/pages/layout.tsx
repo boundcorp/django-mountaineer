@@ -11,7 +11,7 @@ export const LayoutPage = createServerPage(LayoutController);
 
 const AppBar = () => {
     const {user, logout} = LayoutPage.useContext();
-    const userInitials = user ? `${user.email[0].toUpperCase()}` : "";
+    const userInitials = user?.email ? `${user.email[0].toUpperCase()}` : "";
 
     return (
         <div className="flex-none p-4 bg-base-100 shadow-md">

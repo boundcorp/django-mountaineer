@@ -35,7 +35,7 @@ def register_controllers(app_controller, search_paths):
         app_controller.register(controller())
 
 
-def enable_hotreload_controllers_in_views_folder():
+def patch_enable_hotreload_controllers_in_views_folder():
     from mountaineer import cli
 
     def patched_is_view_update(path: Path):

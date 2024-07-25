@@ -9,7 +9,7 @@ from pydantic import BaseModel, ConfigDict
 from starlette.requests import Request
 from django.db.models import F
 
-from example.apps.polls.models import Choice, Question
+from example.apps.polls.models import Choice, Question, PublicChoices
 from django_mountaineer.controllers import PageController
 from djantic import ModelSchema
 
@@ -31,9 +31,11 @@ class ChoiceOutput(AsyncModelSchema, ModelSchema):
 class QuestionOutput(AsyncModelSchema, ModelSchema):
     model_config = ConfigDict(model=Question)
     choices: list[ChoiceOutput] = []
+    publicity: PublicChoices
 
 class CreateQuestion(BaseModel):
     question_text: str
+    publicity: PublicChoices
     choices: list[str]
 
 
