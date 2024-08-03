@@ -1,21 +1,18 @@
-# Simple Django-Mountaineer Integration Example
+# Django-Mountaineer Integration 
 
-This is a simple example of how to integrate Django with [Mountaineer](https://mountaineer.sh).
-These are the bare-minimum steps to get Django and Mountaineer to work together, which you should be able
-to follow in any Django project. I've demonstrated this with a fresh Django 5.0 project, to avoid unforeseen complications.
+Using Django with a FastAPI application like [Mountaineer](https://mountaineer.sh) is pretty straightforward, using FastAPI.mount().
 
-## Clean django and mountaineer projects
+However, there are a few gotchas in fully integrating Django, which this library aims to solve.
 
-I started with a simplest-possible django project (`django-admin startproject backend`) with a single app `polls`,
-following
-the [Django tutorial](https://docs.djangoproject.com/en/5.0/intro/tutorial01/), and added a mountaineer project (
-called "frontend").
+# Installation & Integration
 
-## Mount Django in your Mountaineer app
+You can reference the `example` folder for a complete example of a django project with a mountaineer app.
 
-Django can be mounted in a Mountaineer app by adding a few lines to the `frontend/app.py` file.
+## Mount Django in your Mountaineer app (no library required)
 
-Add to `frontend/app.py` (mount django *after* mountaineer controller registrations):
+Django can be mounted in a Mountaineer app by adding a few lines to the `example/app.py` file.
+
+Add to `example/app.py` (mount django *after* mountaineer controller registrations):
 
 ```python
 from django.core.asgi import get_asgi_application
@@ -36,8 +33,7 @@ controller.app.mount("/staticfiles", StaticFiles(directory="staticfiles"), name=
 
 ## Run Django and Mountaineer together
 
-You can start the normal Mountaineer development server with the following command:
-
+You can start the normal Mountaineer development server with the following command, instead of django's runserver:
 ```bash
 poetry run runserver
 ```
@@ -50,16 +46,20 @@ poetry run python manage.py createsuperuser
 ```
 
 The django admin will be accessible at http://localhost:5006/admin/.
-You should view the [HomeController](/frontend/controllers/home.py) at http://localhost:5006/,
+You should view the [HomeController](/example/example/controllers/home.py) at http://localhost:5006/,
 which shows an example of retrieving resources from Django ORM and returning them via mountaineer SSR.
 
 ## Extras
 
+### Django Sessions and Authentication in FastAPI/Mountaineer
+
+We have 2 options for exposing Django sessions and authentication in FastAPI/Mountaineer:
+
+1. (heavy, more complete) Use django's full middleware stack, by adding the `django_mountaineer.DjangoMiddlewareRunner` to your FastAPI middleware.
+2. (lightweight, less complete) Use `django_mountaineer.get_session` Dependency Injection, which is an async re-implementation of django's session middleware, for loading the user as a dependency.
+
+
 ### Controller Sniffing
-If you check my `frontend/app.py`, you'll see that I'm using a simple controller sniffing mechanism to automatically
-load the controllers files found within the `frontend/controllers` folder.
+If you check my `example/example/app.py`, you'll see that I'm using a simple controller sniffing mechanism to automatically
+load the controllers files found within the `example/example/views` folder.
 This is a simple django-esque autoloader to adapt to the mountaineer convention and just a personal preference.
-
-### WIP
-
-- [ ] use Django Auth in Mountaineer views
