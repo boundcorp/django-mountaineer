@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as HomeController from "./_server";
-import { Dialog, Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
+import { Dialog, Menu, MenuButton, MenuItem, MenuItems, Transition, TransitionChild, DialogPanel, DialogTitle, RadioGroup, RadioGroupOption, Radio } from '@headlessui/react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { handleFormSubmit } from "@/components/utils";
 import { createServerPage } from "@/components/ServerPages";
@@ -9,6 +9,39 @@ import { EnumPublicChoices } from "@/enums";
 
 const HomePage = createServerPage(HomeController);
 
+const FadeInOut = ({ show, children }: { show: boolean, children: React.ReactNode }) => (
+  <Transition appear show={show} as={React.Fragment}>
+    <Dialog as="div" className="relative z-10" onClose={() => {}}>
+      <TransitionChild
+        as={React.Fragment}
+        enter="ease-out duration-300"
+        enterFrom="opacity-0"
+        enterTo="opacity-100"
+        leave="ease-in duration-200"
+        leaveFrom="opacity-100"
+        leaveTo="opacity-0"
+      >
+        <div className="fixed inset-0 bg-black bg-opacity-25" />
+      </TransitionChild>
+
+      <div className="fixed inset-0 overflow-y-auto">
+        <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <TransitionChild
+            as={React.Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+          >
+            {children}
+          </TransitionChild>
+        </div>
+      </div>
+    </Dialog>
+  </Transition>
+);
 
 const CreateQuestionModal = ({ closeModal }: { closeModal: () => void }) => {
   const { create } = HomePage.useContext();
@@ -19,7 +52,7 @@ const CreateQuestionModal = ({ closeModal }: { closeModal: () => void }) => {
       choices: [{ choice_text: '' }]
     }
   });
-  const { register, control, handleSubmit } = form;
+  const { register, control } = form;
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'choices'
@@ -40,11 +73,35 @@ const CreateQuestionModal = ({ closeModal }: { closeModal: () => void }) => {
         <label className="label">
           <span className="label-text">Publicity</span>
         </label>
-        <select {...register('publicity')} className="select select-bordered">
+        <RadioGroup {...register('publicity')} className="space-y-2">
           {Object.values(EnumPublicChoices).map((option) => (
-            <option key={option.value} value={option.value}>{option.label}</option>
+            <Radio key={option.value} value={option.value} className={({ checked }) =>
+              `${checked ? 'bg-blue-500 text-white' : 'bg-white text-black'}
+              relative rounded-lg shadow-md px-5 py-4 cursor-pointer flex focus:outline-none`
+            }>
+              {({ checked }) => (
+                <>
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center">
+                      <div className="text-sm">
+                        <RadioGroup.Label as="p" className={`font-medium ${checked ? 'text-white' : 'text-gray-900'}`}>
+                          {option.label}
+                        </RadioGroup.Label>
+                      </div>
+                    </div>
+                    {checked && (
+                      <div className="flex-shrink-0 text-white">
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </Radio>
           ))}
-        </select>
+        </RadioGroup>
       </div>
       <fieldset className="form-control mb-4">
         <legend className="label-text mb-2">Choices</legend>
@@ -56,13 +113,16 @@ const CreateQuestionModal = ({ closeModal }: { closeModal: () => void }) => {
         ))}
         <button type="button" onClick={() => append({ choice_text: '' })} className="btn btn-secondary">Add Choice</button>
       </fieldset>
-      <button type="submit" className="btn btn-primary">Create</button>
+      <div className="flex justify-end space-x-2">
+        <button type="button" onClick={closeModal} className="btn btn-secondary">Cancel</button>
+        <button type="submit" className="btn btn-primary">Create</button>
+      </div>
     </form>
   );
 };
 
 const Home = () => {
-  const { questions, create, vote, clear } = HomePage.useContext();
+  const { questions, vote, clear } = HomePage.useContext();
   const { user } = LayoutPage.useContext();
   const [isOpen, setIsOpen] = React.useState(false);
 
@@ -102,48 +162,20 @@ const Home = () => {
         </Menu>
       </div>
       <div className="card">
-        <Transition appear show={isOpen} as={React.Fragment}>
-          <Dialog as="div" className="relative z-10" onClose={closeModal}>
-            <Transition.Child
-              as={React.Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0"
-              enterTo="opacity-100"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100"
-              leaveTo="opacity-0"
-            >
-              <div className="fixed inset-0 bg-black bg-opacity-25" />
-            </Transition.Child>
-
-            <div className="fixed inset-0 overflow-y-auto">
-              <div className="flex min-h-full items-center justify-center p-4 text-center">
-                <Transition.Child
-                  as={React.Fragment}
-                  enter="ease-out duration-300"
-                  enterFrom="opacity-0 scale-95"
-                  enterTo="opacity-100 scale-100"
-                  leave="ease-in duration-200"
-                  leaveFrom="opacity-100 scale-100"
-                  leaveTo="opacity-0 scale-95"
-                >
-                  <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
-                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-white">
-                      Create a new question
-                    </Dialog.Title>
-                    <CreateQuestionModal closeModal={closeModal} />
-                  </Dialog.Panel>
-                </Transition.Child>
-              </div>
-            </div>
-          </Dialog>
-        </Transition>
+        <FadeInOut show={isOpen}>
+          <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all">
+            <DialogTitle as="h3" className="text-lg font-medium leading-6 text-white">
+              Create a new question
+            </DialogTitle>
+            <CreateQuestionModal closeModal={closeModal} />
+          </DialogPanel>
+        </FadeInOut>
         <ol>
-          {questions.map((question, idx) => (
+          {questions.map((question) => (
             <div key={question.pub_date}>
               <li><b>{question.question_text}</b></li>
               <ul>
-                {question.choices.map((choice, idx) => (
+                {question.choices.map((choice) => (
                   <li key={choice.choice_text} className="p-1">
                     <button className="ml-2 btn btn-primary btn-sm" onClick={() => question?.id && choice?.id && vote({ question_id: question.id, choice_id: choice.id })}>Vote</button>
                     &nbsp; {choice.choice_text} ({choice.votes} votes)
