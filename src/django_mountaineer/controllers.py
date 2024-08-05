@@ -15,6 +15,8 @@ def find_controllers(search_paths: List[str]) -> List[Type[ControllerBase]]:
         for controller_path in glob.glob(
             os.path.join(prefix, "**/*.py"), recursive=True
         ):
+            if "/test_" in controller_path:
+                continue
             controller_module = controller_path.replace("/", ".").replace("\\", ".")[
                 :-3
             ]
