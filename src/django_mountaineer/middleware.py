@@ -92,7 +92,7 @@ class FastAPIDjangoMiddleware(BaseHTTPMiddleware):
     async def convert_to_django_response(
         self, response: StarletteResponse
     ) -> HttpResponse:
-        if isinstance(response, StreamingResponse):
+        if hasattr(response, "body_iterator"):
             content = b"".join([chunk async for chunk in response.body_iterator])
         else:
             content = response.body
