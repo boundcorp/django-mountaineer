@@ -49,20 +49,32 @@ class FastAPIDjangoMiddleware(BaseHTTPMiddleware):
             for url in self.django_patterns
             if url.pattern.match(request.url.path.lstrip("/"))
         ]:
-            return await call_next(request)
+            try:
+                response = await call_next(request)
+                if response is None:
+                    raise RuntimeError(f"No response returned from Django view: {request.url.path}")
+                return response
+            except Exception as e:
+                print(f"Error in Django view: {str(e)}")
+                return StarletteResponse(status_code=500, content="Internal Server Error")
+
         django_request = await self.convert_to_django_request(request)
         response = self.django_middleware_runner.process_request(django_request)
         request.state.django_request = django_request
+
         if response is None:
-            starlette_response = await call_next(request)
-            if starlette_response is None:
-                # Handle the case when no response is returned
-                starlette_response = StarletteResponse(status_code=404, content="Not Found")
-            django_response = await self.convert_to_django_response(starlette_response)
-            django_response = await sync_to_async(
-                self.django_middleware_runner.process_response
-            )(django_request, django_response)
-            return self.convert_to_starlette_response(django_response)
+            try:
+                starlette_response = await call_next(request)
+                if starlette_response is None:
+                    raise RuntimeError("No response returned from FastAPI route.")
+                django_response = await self.convert_to_django_response(starlette_response)
+                django_response = await sync_to_async(
+                    self.django_middleware_runner.process_response
+                )(django_request, django_response)
+                return self.convert_to_starlette_response(django_response)
+            except Exception as e:
+                print(f"Error in FastAPI route: {str(e)}")
+                return StarletteResponse(status_code=500, content="Internal Server Error")
         else:
             return self.convert_to_starlette_response(response)
 
