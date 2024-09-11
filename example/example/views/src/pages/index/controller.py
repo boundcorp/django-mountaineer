@@ -43,7 +43,7 @@ class HomeRender(RenderBase):
     questions: list[QuestionOutput] = []
 
 # Need to wrap render in sync_to_async
-class HomeController(PageController()):
+class HomeController(PageController):
     def render( self ) -> HomeRender:
         return HomeRender(
             questions=QuestionOutput.from_qs(Question.objects.prefetch_related('choices').all()),
