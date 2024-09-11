@@ -55,6 +55,9 @@ class FastAPIDjangoMiddleware(BaseHTTPMiddleware):
         request.state.django_request = django_request
         if response is None:
             starlette_response = await call_next(request)
+            if starlette_response is None:
+                # Handle the case when no response is returned
+                starlette_response = StarletteResponse(status_code=404, content="Not Found")
             django_response = await self.convert_to_django_response(starlette_response)
             django_response = await sync_to_async(
                 self.django_middleware_runner.process_response
