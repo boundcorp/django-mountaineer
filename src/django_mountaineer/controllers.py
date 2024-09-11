@@ -75,31 +75,28 @@ class SyncControllerBase(ControllerBase):
         return self
 
 class PageController(SyncControllerBase):
-    def __init__(self, url: str | None = None, page_path="src/pages"):
+    def __init__(self, url: str | None = None, pages_dir="views/src/pages"):
         super().__init__()
-        self.url = url or self.get_page_path(page_path)
-        self.view_path = f"{self.get_controller_path()}/page.tsx"
+        self.absolute_path = os.path.abspath(inspect.getabsfile(self.__class__))
 
-    def get_page_path(self, page_path: str) -> str:
-        abs_path = os.path.abspath(
-            (inspect.stack()[1])[1]
-        )  # get the path of the file that called this function
-        parts = abs_path.split("/")
-        views_index = parts.index(
-            "views"
-        )  # find the first 'views' folder in the hierarchy
-        controller_path = "/".join(parts[views_index + 1 : -1])
-        url = controller_path.split(page_path)[1] or "/"
+        if not pages_dir in self.absolute_path:
+            raise ValueError(f"PageController must be located in {pages_dir}")
+
+        self.url = url or self.get_page_path(pages_dir)
+        self.view_path = f"{self.get_relative_path(remove_leading_views=True)}/page.tsx"
+
+    def get_page_path(self, pages_dir: str) -> str:
+        remaining_path = self.get_relative_path().split(pages_dir)[-1]
+        url = remaining_path or "/"
         if url.endswith("/index"):
             url = url[:-5]
         return url
 
-    def get_controller_path(self) -> str:
-        abs_path = os.path.abspath(
-            (inspect.stack()[1])[1]
-        )  # get the path of the file that called this function
-        parts = abs_path.split("/")
-        views_index = parts.index(
+    def get_relative_path(self, remove_leading_views: bool = False) -> str:
+        parts = self.absolute_path.split("/")
+        from_index = parts.index(
             "views"
         )  # find the first 'views' folder in the hierarchy
-        return "/".join(parts[views_index + 1 : -1])
+        if remove_leading_views:
+            from_index += 1
+        return "/".join(parts[from_index: -1])
